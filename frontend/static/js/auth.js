@@ -18,12 +18,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Insertar el mensaje al principio del formulario
         const form = loginForm || registerForm || registrationForm;
-        form.parentNode.insertBefore(messageEl, form);
-        
-        // Eliminar el mensaje después de 5 segundos
-        setTimeout(() => {
-            messageEl.remove();
-        }, 5000);
+        if (form) {
+            form.parentNode.insertBefore(messageEl, form);
+            
+            // Eliminar el mensaje después de 5 segundos
+            setTimeout(() => {
+                messageEl.remove();
+            }, 5000);
+        }
     }
     
     // Función para guardar el token y redirigir al dashboard
@@ -45,8 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mostrar mensaje de error
         let errorMessage = 'Ocurrió un error. Por favor, inténtalo de nuevo.';
         
+        // Intentar extraer el mensaje de error de la respuesta
         if (error.response && error.response.data && error.response.data.error) {
             errorMessage = error.response.data.error;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        } else if (error.message) {
+            errorMessage = error.message;
         }
         
         showMessage(errorMessage, true);
@@ -67,6 +74,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
+            // Mostrar indicador de carga
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Iniciando sesión...';
+            
             // Enviar solicitud a la API
             fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
@@ -79,8 +92,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             })
             .then(response => {
+                // Restaurar botón
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+                
                 if (!response.ok) {
-                    throw new Error('Credenciales inválidas');
+                    // Intentar obtener el mensaje de error
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Credenciales inválidas');
+                    });
                 }
                 return response.json();
             })
@@ -122,6 +142,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
+            // Validar formato de email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('Por favor, introduce un email válido.', true);
+                return;
+            }
+            
+            // Mostrar indicador de carga
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Registrando...';
+            
             // Enviar solicitud a la API
             fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
@@ -135,7 +168,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             })
             .then(response => {
+                // Restaurar botón
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+                
                 if (!response.ok) {
+                    // Intentar obtener el mensaje de error
                     return response.json().then(data => {
                         throw new Error(data.error || 'Error al registrar');
                     });
@@ -156,9 +194,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const token = localStorage.getItem('token');
         
         if (!token) {
-            // Si no hay token, redirigir al login
+            // Si no hay token, redirigir al login en páginas protegidas
             if (!window.location.pathname.includes('/login') && 
                 !window.location.pathname.includes('/register') && 
+                !window.location.pathname.startsWith('/api') && 
                 window.location.pathname !== '/') {
                 window.location.href = '/login';
             }
@@ -169,6 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.location.pathname.includes('/login') || 
             window.location.pathname.includes('/register')) {
             window.location.href = '/dashboard';
+            return;
         }
         
         // Verificar la validez del token
@@ -187,6 +227,9 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             // Actualizar información del usuario
             localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // Actualizar elementos de la UI con información del usuario
+            updateUserUI(data.user);
         })
         .catch(error => {
             console.error('Error de autenticación:', error);
@@ -196,8 +239,31 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!window.location.pathname.includes('/login') && 
                 !window.location.pathname.includes('/register') && 
+                !window.location.pathname.startsWith('/api') && 
                 window.location.pathname !== '/') {
                 window.location.href = '/login';
+            }
+        });
+    }
+    
+    // Función para actualizar elementos de la UI con información del usuario
+    function updateUserUI(user) {
+        // Actualizar el nombre del usuario
+        const userNameElements = document.querySelectorAll('.user-name, #user-name');
+        userNameElements.forEach(el => {
+            if (el) el.textContent = user.name;
+        });
+        
+        // Actualizar iniciales del usuario para el avatar
+        const userInitialsElements = document.querySelectorAll('.user-initials, #user-initials');
+        userInitialsElements.forEach(el => {
+            if (el) {
+                // Obtener iniciales a partir del nombre
+                const initials = user.name.split(' ')
+                    .map(name => name.charAt(0))
+                    .join('')
+                    .toUpperCase();
+                el.textContent = initials;
             }
         });
     }

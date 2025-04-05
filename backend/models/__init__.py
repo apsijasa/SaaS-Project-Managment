@@ -164,7 +164,17 @@ class Milestone(db.Model):
     date = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    def to_dict(self):
+    def to_dict(self):from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+# Importar modelos para que estén disponibles desde el módulo
+from .user import User
+from .project import Project
+from .participant import Participant
+from .task import Task
+from .subtask import Subtask
+from .milestone import Milestone
         return {
             'id': self.id,
             'project_id': self.project_id,

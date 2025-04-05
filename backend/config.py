@@ -1,93 +1,65 @@
-# backend/config.py
 import os
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
 
 class Config:
+    """Configuración base para todos los entornos"""
+    
     # Configuración general
     SECRET_KEY = os.environ.get('SECRET_KEY', 'mi_clave_secreta_por_defecto')
     
     # Configuración de la base de datos
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'mysql://user:password@localhost/project_management')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///project_management.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Configuración JWT
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt_clave_secreta_por_defecto')
-    JWT_ACCESS_TOKEN_EXPIRES = 3600  # 1 hora
+    JWT_ACCESS_TOKEN_EXPIRES = 3600 * 24  # 24 horas
     
+    # Configuración de archivos
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB máximo para subida de archivos
+    ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar'}
+
 class DevelopmentConfig(Config):
+    """Configuración para entorno de desarrollo"""
+    
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql://user:password@localhost/project_management_dev'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///project_management_dev.db')
 
 class TestingConfig(Config):
+    """Configuración para entorno de pruebas"""
+    
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'mysql://user:password@localhost/project_management_test'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///project_management_test.db')
+    
+    # Desactivar protección CSRF para pruebas
+    WTF_CSRF_ENABLED = False
 
 class ProductionConfig(Config):
+    """Configuración para entorno de producción"""
+    
     DEBUG = False
-    # En producción, asegúrate de configurar estas variables de entorno
-    # SECRET_KEY = os.environ.get('SECRET_KEY')
-    # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-    # JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+    
+    # En producción, estas variables deben estar configuradas en el servidor
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+    
+    # En producción, se debe usar una base de datos más robusta
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    
+    # Configuración de seguridad
+    SESSION_COOKIE_SECURE = True
+    REMEMBER_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_HTTPONLY = True
 
+# Diccionario de configuraciones
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
     'default': DevelopmentConfig
 }
-
-# backend/app.py
-from flask import Flask
-from flask_cors import CORS
-from flask_jwt_extended import JWTManager
-from config import config
-from models import db
-from routes import register_routes
-
-def create_app(config_name='default'):
-    app = Flask(__name__,
-                static_folder='../frontend/static',
-                template_folder='../frontend/templates')
-    
-    # Configuración de la aplicación
-    app.config.from_object(config[config_name])
-    
-    # Inicialización de extensiones
-    db.init_app(app)
-    jwt = JWTManager(app)
-    CORS(app)
-    
-    # Registro de rutas
-    register_routes(app)
-    
-    # Crear tablas en la base de datos
-    with app.app_context():
-        db.create_all()
-    
-    return app
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run(host='0.0.0.0', port=5000)
-
-# backend/routes/__init__.py
-def register_routes(app):
-    # Importar las rutas
-    from .auth import auth_bp
-    from .projects import projects_bp
-    from .participants import participants_bp
-    from .tasks import tasks_bp
-    from .milestones import milestones_bp
-    
-    # Registrar los blueprints
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(projects_bp, url_prefix='/api/projects')
-    app.register_blueprint(participants_bp, url_prefix='/api/participants')
-    app.register_blueprint(tasks_bp, url_prefix='/api/tasks')
-    app.register_blueprint(milestones_bp, url_prefix='/api/milestones')
-    
-    # Ruta principal para servir la aplicación frontend
-    @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')
-    def catch_all(path):
-        from flask import render_template
-        return render_template('index.html')
