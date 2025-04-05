@@ -1,0 +1,52 @@
+<!-- frontend/templates/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProjectPro - Gestión de Proyectos SaaS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>ProjectPro</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#features">Características</a></li>
+                    <li><a href="#pricing">Precios</a></li>
+                    <li><a href="#about">Nosotros</a></li>
+                    <li><a href="{{ url_for('login') }}" class="btn btn-secondary">Iniciar Sesión</a></li>
+                    <li><a href="#signup" class="btn btn-primary">Registrarse</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Gestiona tus proyectos de manera eficiente</h2>
+                <p>Plataforma completa para la gestión de proyectos, tareas, equipos y plazos en un solo lugar.</p>
+                <a href="#signup" class="btn btn-large btn-primary">Comenzar Ahora - ¡Es Gratis!</a>
+            </div>
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='images/project-dashboard.png') }}" alt="Dashboard de Proyectos">
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Características Principales</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3>Gestión de Tareas</h3>
+                    <p>Crea, asigna y realiza segu

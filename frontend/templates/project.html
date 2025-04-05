@@ -1,0 +1,119 @@
+<!-- frontend/templates/project.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Proyecto - ProjectPro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>ProjectPro</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="{{ url_for('projects') }}" class="active"><i class="fas fa-project-diagram"></i> Proyectos</a></li>
+                    <li><a href="{{ url_for('tasks') }}"><i class="fas fa-tasks"></i> Tareas</a></li>
+                    <li><a href="{{ url_for('calendar') }}"><i class="fas fa-calendar-alt"></i> Calendario</a></li>
+                    <li><a href="{{ url_for('reports') }}"><i class="fas fa-chart-bar"></i> Reportes</a></li>
+                    <li><a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Configuración</a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span id="user-initials">JS</span>
+                    </div>
+                    <div>
+                        <div class="user-name" id="user-name">Juan Silva</div>
+                        <div class="user-role">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Botón para mostrar/ocultar sidebar en móviles -->
+        <div class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <!-- Header del Proyecto -->
+            <div class="dashboard-header">
+                <div class="page-title">
+                    <h1 id="project-name">Rediseño del sitio web</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-light" id="btn-edit-project"><i class="fas fa-edit"></i> Editar</button>
+                    <div class="dropdown">
+                        <button class="btn btn-light"><i class="fas fa-ellipsis-v"></i></button>
+                        <div class="dropdown-menu">
+                            <a href="#" id="btn-export-project"><i class="fas fa-file-export"></i> Exportar</a>
+                            <a href="#" id="btn-archive-project"><i class="fas fa-archive"></i> Archivar</a>
+                            <a href="#" id="btn-delete-project" class="text-danger"><i class="fas fa-trash"></i> Eliminar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detalle del Proyecto -->
+            <div class="project-detail">
+                <!-- Contenido principal del proyecto -->
+                <div class="project-detail-main">
+                    <!-- Encabezado del proyecto -->
+                    <div class="project-header">
+                        <h2 class="project-title" id="project-title">Rediseño del sitio web</h2>
+                        <div class="project-meta">
+                            <div id="project-dates"><i class="fas fa-calendar-alt"></i> 15 Dic 2023 - 28 Feb 2024</div>
+                            <div id="project-progress"><i class="fas fa-chart-line"></i> Progreso: 75%</div>
+                            <div id="project-budget"><i class="fas fa-dollar-sign"></i> Presupuesto: $12,000</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pestañas del proyecto -->
+                    <div class="project-tabs">
+                        <div class="project-tab active" data-tab="overview">Resumen</div>
+                        <div class="project-tab" data-tab="tasks">Tareas</div>
+                        <div class="project-tab" data-tab="milestones">Hitos</div>
+                        <div class="project-tab" data-tab="team">Equipo</div>
+                        <div class="project-tab" data-tab="files">Archivos</div>
+                    </div>
+                    
+                    <!-- Contenido de las pestañas -->
+                    <div class="tab-content active" id="tab-overview">
+                        <!-- Resumen del proyecto -->
+                        <div class="project-description">
+                            <h3>Descripción</h3>
+                            <p id="project-description">Actualización completa del sitio web corporativo para mejorar la experiencia de usuario, optimizar el rendimiento y implementar un nuevo diseño acorde con la marca actualizada. El proyecto incluye la revisión de la arquitectura de información, rediseño de componentes UI y optimización para dispositivos móviles.</p>
+                        </div>
+                        
+                        <!-- Progreso del proyecto -->
+                        <div class="project-progress-summary">
+                            <div class="progress-title">
+                                <h4>Progreso General</h4>
+                                <span class="progress-percentage">75%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Línea de tiempo del proyecto -->
+                        <div class="timeline">
+                            <div class="timeline-header">
+                                <h3>Línea de Tiempo</h3>
+                                <div class="timeline-view-options">
+                                    <div class="view-option active" data-view="quarterly">Trimestral</div>
+                                    <div class="view-option" data-view="biannual">Semestral</div>
+                                    <div class="view-option" data-view="annual">Anual</div>
+                                </div>
